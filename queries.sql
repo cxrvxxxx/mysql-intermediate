@@ -127,6 +127,16 @@ BEGIN
 END //
 
 DELIMITER ;
+-- Account Statistics View
+CREATE VIEW vw_AccountStatistics AS
+SELECT
+    a.id,
+    a.firstname,
+    a.lastname,
+    (SELECT COUNT(*) FROM tblvehicle v WHERE v.owner_id = a.id) AS `No. of Owned Vehicles`,
+    (SELECT COUNT(*) FROM tblbooking b WHERE b.booker_id = a.id) AS `No. of Bookings`
+FROM tblaccount a;
+
 -- Vehicle and Owner View
 CREATE VIEW vw_VehiclesWithOwners AS
 SELECT
@@ -285,8 +295,9 @@ SET @updated_firstname = "";
 SET @updated_lastname = "";
 
 CALL sp_InsertAccount("John", "Doe", @last_insert_id);
-CALL sp_UpdateAccount(1, "Jane", "Doe", @updated_firstname, @updated_lastname);
-CALL sp_DeleteAccount(1);
 CALL sp_InsertVehicle("Matte Light Brown", "Yamaha", "Sniper 155R", "G86NG", NULL, NULL);
+SELECT * FROM vw_AccountStatistics WHERE id = 1;
+CALL sp_UpdateAccount(1, "Jane", "Doe", @updated_firstname, @updated_lastname);
 CALL sp_UpdateVehicle(1, "Light Brown", "123ABC");
+CALL sp_DeleteAccount(1);
 CALL sp_DeleteVehicle(1);
